@@ -52,6 +52,16 @@
             <artifactId>xchange-mtgox</artifactId>
             <version>${version.xchange}</version>
         </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-bitcoin24</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-bitcoincentral</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

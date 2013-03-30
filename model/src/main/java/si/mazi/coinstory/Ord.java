@@ -23,13 +23,19 @@ public class Ord {
 
     private Date time;
 
+    private String service;
+
+    private String currency;
+
     protected Ord() { }
 
-    public Ord(Order.OrderType orderType, double amount, double price, Date time) {
-        this.orderType = orderType;
+    public Ord(Order.OrderType type, double amount, double price, Date time, String service, String currency) {
+        this.orderType = type;
         this.amount = amount;
         this.price = price;
         this.time = time;
+        this.service = service;
+        this.currency = currency;
     }
 
     public Order.OrderType getOrderType() {
@@ -46,6 +52,14 @@ public class Ord {
 
     public Date getTime() {
         return time;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     @Override
