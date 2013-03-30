@@ -30,13 +30,27 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>10.0.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.4</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-bitstamp</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-btce</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-mtgox</artifactId>
+            <version>${version.xchange}</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -53,6 +67,7 @@
                 <version>${project.version}</version>
                 <!--<packaging>pom</packaging>-->
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -135,6 +150,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.xchange>develop-SNAPSHOT</version.xchange>
     </properties>
 
 </project>
