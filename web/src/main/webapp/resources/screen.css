@@ -1,0 +1,31 @@
+body {
+    padding: 5%;
+    background-color: #ddd;
+    font-family: Verdana, sans-serif;
+    font-size: 0.9em;
+}
+code {
+    font-size: 1.1em;
+}
+span.invalid {
+    padding-left: 3px;
+    color: red;
+}
+
+.msgs {
+    background-color: #ccffcc;
+}
+
+table.data th, table.data thead {
+    font-weight: bold;
+    background-color: #aaa;
+}
+
+table.data {
+    background-color: #eee;
+}
+
+table.data td, table.data th {
+    padding: 2px 10px;
+}
+
