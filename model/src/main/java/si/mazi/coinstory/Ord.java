@@ -2,9 +2,7 @@ package si.mazi.coinstory;
 
 import com.xeiam.xchange.dto.Order;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -15,6 +13,7 @@ public class Ord {
     @Id @GeneratedValue
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private Order.OrderType orderType;
 
     private double amount;
