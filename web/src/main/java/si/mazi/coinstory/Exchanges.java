@@ -66,6 +66,7 @@ public class Exchanges {
                 }
             }
         }
+        log.debug("--- Done. ");
     }
 
     static Date getThisMinute() {
