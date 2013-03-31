@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
+import com.xeiam.xchange.ExchangeSpecification;
 import com.xeiam.xchange.bitcoin24.Bitcoin24Exchange;
 import com.xeiam.xchange.bitcoincentral.BitcoinCentralExchange;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
@@ -36,17 +37,31 @@ public class Exchanges {
 
     public Exchanges() {
         log.debug("Exchanges: init");
-        currencies.put(BitstampExchange.class, USD);
         currencies.put(MtGoxExchange.class, USD);
         currencies.put(MtGoxExchange.class, EUR);
+        currencies.put(BitstampExchange.class, USD);
         currencies.put(BTCEExchange.class, USD);
         currencies.put(BTCEExchange.class, EUR);
         currencies.put(Bitcoin24Exchange.class, EUR);
         currencies.put(BitcoinCentralExchange.class, EUR);
 
-        List<Class<? extends Exchange>> exchanges = Arrays.<Class<? extends Exchange>>asList(BitstampExchange.class, MtGoxExchange.class, BTCEExchange.class, Bitcoin24Exchange.class, BitcoinCentralExchange.class);
+        List<Class<? extends Exchange>> exchanges = new ArrayList<Class<? extends Exchange>>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {
-            services.put(exchange, ExchangeFactory.INSTANCE.createExchange(exchange.getCanonicalName()).getPollingMarketDataService());
+            Exchange exc = null;
+            if (MtGoxExchange.class.isAssignableFrom(exchange)) {
+                // https (default) doesn't work for MtGox since we don't have the issuing CA in our trust store. Using http.
+                try {
+                    ExchangeSpecification exSpec = exchange.newInstance().getDefaultExchangeSpecification();
+                    exSpec.setUri(exSpec.getUri().replaceAll("^https://", "http://"));
+                    exc = ExchangeFactory.INSTANCE.createExchange(exSpec);
+                } catch (ReflectiveOperationException e) {
+                    log.error("Error creating exchange with no-https uri; using default: {}", exchange);
+                }
+            }
+            if (exc == null) {
+                exc = ExchangeFactory.INSTANCE.createExchange(exchange.getCanonicalName());
+            }
+            services.put(exchange, exc.getPollingMarketDataService());
         }
     }
 
@@ -62,7 +77,7 @@ public class Exchanges {
                 try {
                     downloader.readData(services.get(service), currency, service.getSimpleName(), now);
                 } catch (IOException e) {
-                    log.error("Error reading data for {} from {}: {}", new Object[]{currency, serviceName, e.getCause()});
+                    log.error("Error reading data for {} from {}: {}", new Object[]{currency, serviceName, Utils.joinToString(e)});
                 }
             }
         }
