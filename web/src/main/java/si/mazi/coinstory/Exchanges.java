@@ -10,15 +10,13 @@ import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
 import com.xeiam.xchange.mtgox.v1.MtGoxExchange;
 import com.xeiam.xchange.service.marketdata.polling.PollingMarketDataService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.*;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Matija Mazi <br/>
@@ -44,7 +42,6 @@ public class Exchanges {
         currencies.put(BTCEExchange.class, USD);
         currencies.put(BTCEExchange.class, EUR);
         currencies.put(Bitcoin24Exchange.class, EUR);
-        currencies.put(BitcoinCentralExchange.class, USD);
         currencies.put(BitcoinCentralExchange.class, EUR);
 
         List<Class<? extends Exchange>> exchanges = Arrays.<Class<? extends Exchange>>asList(BitstampExchange.class, MtGoxExchange.class, BTCEExchange.class, Bitcoin24Exchange.class, BitcoinCentralExchange.class);
@@ -56,17 +53,22 @@ public class Exchanges {
     @Schedule(hour = "*", minute = "*/15", persistent = false, info = "Exchange data reader")
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public void readAll() {
-        log.info("======= Exchanges.readAll");
+        Date now = getThisMinute();
+        log.info("======= Exchanges.readAll for {}", now);
         for (Class<? extends Exchange> service : services.keySet()) {
             String serviceName = service.getSimpleName();
             for (String currency : currencies.get(service)) {
                 log.info("Getting from {} for {}", serviceName, currency);
                 try {
-                    downloader.readData(services.get(service), currency, service.getSimpleName());
+                    downloader.readData(services.get(service), currency, service.getSimpleName(), now);
                 } catch (IOException e) {
                     log.error("Error reading data for {} from {}: {}", new Object[]{currency, serviceName, e.getCause()});
                 }
             }
         }
+    }
+
+    static Date getThisMinute() {
+        return new DateTime(System.currentTimeMillis()).withSecondOfMinute(0).withMillisOfSecond(0).toDate();
     }
 }

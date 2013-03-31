@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.trade.LimitOrder;
 import com.xeiam.xchange.service.marketdata.polling.PollingMarketDataService;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +26,7 @@ public class OrderBookDownloader {
     @PersistenceContext private EntityManager em;
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void readData(PollingMarketDataService exchange, String currency, String service) throws IOException {
-        Date now = new DateTime().withSecondOfMinute(0).withMillis(0).toDate();
+    public void readData(PollingMarketDataService exchange, String currency, String service, Date time) throws IOException {
         OrderBook orderBook;
         log.info("Connecting to {} for {}...", service, currency);
         try {
@@ -39,7 +37,7 @@ public class OrderBookDownloader {
         int i = 0;
         log.info("Got {} bids and {} asks.", orderBook.getBids().size(), orderBook.getAsks().size());
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
-            em.persist(new Ord(limitOrder.getType(), limitOrder.getTradableAmount().doubleValue(), limitOrder.getLimitPrice().getAmount().doubleValue(), now, service, currency));
+            em.persist(new Ord(limitOrder.getType(), limitOrder.getTradableAmount().doubleValue(), limitOrder.getLimitPrice().getAmount().doubleValue(), time, service, currency));
             if (++i % 100 == 0) {
                 em.flush();
             }
