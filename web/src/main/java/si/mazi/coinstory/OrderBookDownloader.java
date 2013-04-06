@@ -15,7 +15,6 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -31,7 +30,7 @@ public class OrderBookDownloader {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     @Asynchronous
-    public void readData(PollingMarketDataService exchange, String currency, String service, Date time) throws IOException {
+    public void readData(PollingMarketDataService exchange, String currency, String service, Date time) {
         OrderBook orderBook;
         Ticker tck;
         log.info("Connecting to {} for {}...", service, currency);
@@ -39,11 +38,12 @@ public class OrderBookDownloader {
             tck = exchange.getTicker("BTC", currency);
             orderBook = exchange.getFullOrderBook("BTC", currency);
         } catch (Exception e) {
-            throw new IOException("Error connecting to exchange", e);
+            log.error("Error connecting to {}: {}", service, Utils.joinToString(e));
+            return;
         }
         int i = 0;
         log.info("Got ticker, {} bids and {} asks.", orderBook.getBids().size(), orderBook.getAsks().size());
-        em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency));
+        em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
             em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
             if (i++ % 100 == 0) {

@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.*;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -74,11 +73,7 @@ public class Exchanges {
             String serviceName = service.getSimpleName();
             for (String currency : currencies.get(service)) {
                 log.info("Getting from {} for {}", serviceName, currency);
-                try {
-                    downloader.readData(services.get(service), currency, service.getSimpleName(), now);
-                } catch (IOException e) {
-                    log.error("Error reading data for {} from {}: {}", new Object[]{currency, serviceName, Utils.joinToString(e)});
-                }
+                downloader.readData(services.get(service), currency, service.getSimpleName(), now);
             }
         }
         log.debug("--- Done. ");

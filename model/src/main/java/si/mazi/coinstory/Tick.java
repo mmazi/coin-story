@@ -23,11 +23,12 @@ public class Tick {
     private Double volume;
     private Date timestamp;
     private String currency;
+    private String service;
 
     protected Tick() {
     }
 
-    public Tick(String tradableIdentifier, Double last, Double bid, Double ask, Double high, Double low, Double volume, Date timestamp, String currency) {
+    public Tick(String tradableIdentifier, Double last, Double bid, Double ask, Double high, Double low, Double volume, Date timestamp, String currency, String service) {
         this.tradableIdentifier = tradableIdentifier;
         this.last = last;
         this.bid = bid;
@@ -37,5 +38,6 @@ public class Tick {
         this.volume = volume;
         this.timestamp = timestamp;
         this.currency = currency;
+        this.service = service;
     }
 }
