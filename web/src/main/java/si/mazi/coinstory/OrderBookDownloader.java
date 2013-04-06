@@ -9,7 +9,8 @@ import org.joda.money.BigMoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.Stateful;
+import javax.ejb.Asynchronous;
+import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
@@ -22,13 +23,14 @@ import java.util.Date;
  * @author Matija Mazi <br/>
  * @created 3/30/13 6:13 PM
  */
-@Stateful
+@Stateless
 public class OrderBookDownloader {
     private static final Logger log = LoggerFactory.getLogger(OrderBookDownloader.class);
 
     @PersistenceContext private EntityManager em;
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @Asynchronous
     public void readData(PollingMarketDataService exchange, String currency, String service, Date time) throws IOException {
         OrderBook orderBook;
         Ticker tck;
@@ -41,7 +43,7 @@ public class OrderBookDownloader {
         }
         int i = 0;
         log.info("Got ticker, {} bids and {} asks.", orderBook.getBids().size(), orderBook.getAsks().size());
-        em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), tck.getTimestamp(), currency));
+        em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
             em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
             if (i++ % 100 == 0) {
