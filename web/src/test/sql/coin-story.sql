@@ -2,18 +2,27 @@ select service, count(*)
 from ord group by service
 
 
-select cast(price / 50 as integer) , sum(amount), "time"
+-- Ask below X USD/BTC
+select  "time", sum(amount),  count(*), max(price), max(ordertype), max(service)
 from ord
-where service = 'MtGoxExchange' and ordertype = 'BID'
-group by "time", cast(price / 50 as integer)
-having cast(price / 50 as integer) >= 2
-order by cast(price / 50 as integer) desc, "time" desc
+where currency = 'USD'
+ and service = 'MtGoxExchange'
+ and ordertype = 'ASK'
+ and price <= 160
+group by "time"
+order by "time" desc
 
-select cast(price / 50 as integer) , sum(amount), "time"
+-- Bids above X USD/BTC in USD
+select  "time", sum(amount * price),  count(*), min(price), max(ordertype), max(service)
 from ord
-where service = 'MtGoxExchange' and ordertype = 'ASK'
-and price < 1000
-group by "time", cast(price / 50 as integer)
-having cast(price / 50 as integer) <= 3
-order by cast(price / 50 as integer) asc, "time" desc
+where currency = 'USD'
+ and service = 'MtGoxExchange'
+ and ordertype = 'BID'
+ and price >= 100
+group by "time"
+order by "time" desc
 
+
+
+
+select * from tick

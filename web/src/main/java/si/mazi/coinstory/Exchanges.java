@@ -68,6 +68,7 @@ public class Exchanges {
     @Schedule(hour = "*", minute = "*/15", persistent = false, info = "Exchange data reader")
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public void readAll() {
+        // todo: do this in prarallel
         Date now = getThisMinute();
         log.info("======= Exchanges.readAll for {}", now);
         for (Class<? extends Exchange> service : services.keySet()) {
