@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
-import com.xeiam.xchange.ExchangeSpecification;
 import com.xeiam.xchange.bitcoin24.Bitcoin24Exchange;
 import com.xeiam.xchange.bitcoincentral.BitcoinCentralExchange;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
@@ -46,20 +45,7 @@ public class Exchanges {
 
         List<Class<? extends Exchange>> exchanges = new ArrayList<Class<? extends Exchange>>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {
-            Exchange exc = null;
-            if (MtGoxExchange.class.isAssignableFrom(exchange)) {
-                // https (default) doesn't work for MtGox since we don't have the issuing CA in our trust store. Using http.
-                try {
-                    ExchangeSpecification exSpec = exchange.newInstance().getDefaultExchangeSpecification();
-                    exSpec.setUri(exSpec.getUri().replaceAll("^https://", "http://"));
-                    exc = ExchangeFactory.INSTANCE.createExchange(exSpec);
-                } catch (ReflectiveOperationException e) {
-                    log.error("Error creating exchange with no-https uri; using default: {}", exchange);
-                }
-            }
-            if (exc == null) {
-                exc = ExchangeFactory.INSTANCE.createExchange(exchange.getCanonicalName());
-            }
+            Exchange exc = ExchangeFactory.INSTANCE.createExchange(exchange.getCanonicalName());
             services.put(exchange, exc.getPollingMarketDataService());
         }
     }
