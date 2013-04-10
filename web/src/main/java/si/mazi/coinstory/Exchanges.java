@@ -62,7 +62,7 @@ public class Exchanges {
                 downloader.readData(services.get(service), currency, service.getSimpleName(), now);
             }
         }
-        log.debug("--- Done. ");
+        log.info("--- Done. ");
     }
 
     static Date getThisMinute() {
