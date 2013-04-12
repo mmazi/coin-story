@@ -9,14 +9,12 @@ import org.joda.money.BigMoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.Asynchronous;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.concurrent.Future;
 
 /**
  * @author Matija Mazi <br/>
@@ -30,7 +28,7 @@ public class OrderBookDownloader {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     @Asynchronous
-    public void readData(PollingMarketDataService exchange, String currency, String service, Date time) {
+    public Future<Boolean> readData(PollingMarketDataService exchange, String currency, String service, Date time) {
         OrderBook orderBook;
         Ticker tck;
         log.info("Connecting to {} for {}...", service, currency);
@@ -39,10 +37,10 @@ public class OrderBookDownloader {
             orderBook = exchange.getFullOrderBook("BTC", currency);
         } catch (Exception e) {
             log.error("Error connecting to {}: {}", service, Utils.joinToString(e));
-            return;
+            return new AsyncResult<Boolean>(false);
         }
         int i = 0;
-        log.info("Got ticker, {} bids and {} asks.", orderBook.getBids().size(), orderBook.getAsks().size());
+        log.info("{}: Got ticker, {} bids and {} asks.", new Object[]{service, orderBook.getBids().size(), orderBook.getAsks().size()});
         em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
             em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
@@ -50,6 +48,7 @@ public class OrderBookDownloader {
                 em.flush();
             }
         }
+        return new AsyncResult<Boolean>(true);
     }
 
     private Double getDouble(BigDecimal bigDecimal) {
