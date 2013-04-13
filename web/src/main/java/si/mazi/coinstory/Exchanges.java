@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.*;
 import java.util.*;
+import java.util.concurrent.Future;
 
 /**
  * @author Matija Mazi <br/>
@@ -28,7 +29,7 @@ public class Exchanges {
     public static final String USD = "USD";
     public static final String EUR = "EUR";
 
-//    private static final int FINISH_TIMEOUT_SEC = 90;
+    private static final int FINISH_TIMEOUT_SEC = 90;
 
     private Map<Class<? extends Exchange>, PollingMarketDataService> services = new HashMap<Class<? extends Exchange>, PollingMarketDataService>();
     private Multimap<Class<? extends Exchange>, String> currencies = LinkedListMultimap.create();
@@ -56,20 +57,19 @@ public class Exchanges {
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public void readAll() {
         Date now = getThisMinute();
-//        Map<Class<? extends Exchange>, Future<Boolean>> results = new HashMap<>();
+        Map<Class<? extends Exchange>, Future<Boolean>> results = new HashMap<>();
         log.info("======= Exchanges.readAll for {}", now);
         for (Class<? extends Exchange> service : services.keySet()) {
             String serviceName = service.getSimpleName();
             for (String currency : currencies.get(service)) {
                 log.info("Getting from {} for {}", serviceName, currency);
-//                Future<Boolean> result =
+                Future<Boolean> result =
                 downloader.readData(services.get(service), currency, service.getSimpleName(), now);
-//                results.put(service, result);
+                results.put(service, result);
             }
         }
-/*
         boolean allComplete = false;
-        while (!allComplete && System.currentTimeMillis() - now.getTime() > FINISH_TIMEOUT_SEC * 1000) {
+        while (!allComplete && System.currentTimeMillis() - now.getTime() < FINISH_TIMEOUT_SEC * 1000) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -80,8 +80,7 @@ public class Exchanges {
                 allComplete &= result.isDone() || result.isCancelled();
             }
         }
-        log.info("---- Done.");
-*/
+        log.info(allComplete ? "---- Done." : "[Timed out waiting for exchanges to finish, but no matter.]");
     }
 
     static Date getThisMinute() {
