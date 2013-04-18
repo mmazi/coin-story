@@ -3,7 +3,8 @@ coin-story
 
 Bitcoin market order book history.
 
-A very simple application that logs order book snapshots from popular exchanges every 15 minutes into a relational database.
+A very simple application that logs order book snapshots from popular exchanges every 15 minutes into a relational
+database, using JPA.
 
 Uses https://github.com/timmolter/XChange/ to connect to the exchnages in an uniform manner.
 
