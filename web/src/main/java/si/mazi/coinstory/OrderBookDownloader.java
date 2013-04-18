@@ -40,7 +40,7 @@ public class OrderBookDownloader {
             return new AsyncResult<Boolean>(false);
         }
         int i = 0;
-        log.info("{}: Got ticker, {} bids and {} asks.", new Object[]{service, orderBook.getBids().size(), orderBook.getAsks().size()});
+        log.info("{} {}: Got ticker, {} bids and {} asks.", new Object[]{service, currency, orderBook.getBids().size(), orderBook.getAsks().size()});
         em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
             em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
