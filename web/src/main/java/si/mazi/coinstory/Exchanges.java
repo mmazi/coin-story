@@ -53,7 +53,7 @@ public class Exchanges {
         }
     }
 
-    @Schedule(hour = "*", minute = "*/10", persistent = false, info = "Exchange data reader")
+    @Schedule(hour = "*", minute = "*/30", persistent = false, info = "Exchange data reader")
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public void readAll() {
         Date now = getThisMinute();
@@ -80,7 +80,7 @@ public class Exchanges {
                 allComplete &= result.isDone() || result.isCancelled();
             }
         }
-        log.info(allComplete ? "---- Done." : "[Timed out waiting for exchanges to finish, but no matter.]");
+        log.info(allComplete ? "---- All Done." : "[Timed out waiting for exchanges to finish, but no matter.]");
     }
 
     static Date getThisMinute() {
