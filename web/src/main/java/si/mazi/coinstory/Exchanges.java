@@ -4,8 +4,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
-import com.xeiam.xchange.bitcoin24.Bitcoin24Exchange;
-import com.xeiam.xchange.bitcoincentral.BitcoinCentralExchange;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
 import com.xeiam.xchange.mtgox.v1.MtGoxExchange;
@@ -43,8 +41,6 @@ public class Exchanges {
         currencies.put(BitstampExchange.class, USD);
         currencies.put(BTCEExchange.class, USD);
         currencies.put(BTCEExchange.class, EUR);
-        currencies.put(Bitcoin24Exchange.class, EUR);
-        currencies.put(BitcoinCentralExchange.class, EUR);
 
         List<Class<? extends Exchange>> exchanges = new ArrayList<Class<? extends Exchange>>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {
