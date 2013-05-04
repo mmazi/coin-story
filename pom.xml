@@ -57,6 +57,11 @@
             <artifactId>xchange-mtgox</artifactId>
             <version>${version.xchange}</version>
         </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-campbx</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

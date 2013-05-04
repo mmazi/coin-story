@@ -6,6 +6,7 @@ import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
+import com.xeiam.xchange.campbx.CampBXExchange;
 import com.xeiam.xchange.mtgox.v1.MtGoxExchange;
 import com.xeiam.xchange.service.marketdata.polling.PollingMarketDataService;
 import org.joda.time.DateTime;
@@ -41,6 +42,7 @@ public class Exchanges {
         currencies.put(BitstampExchange.class, USD);
         currencies.put(BTCEExchange.class, USD);
         currencies.put(BTCEExchange.class, EUR);
+        currencies.put(CampBXExchange.class, USD);
 
         List<Class<? extends Exchange>> exchanges = new ArrayList<Class<? extends Exchange>>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {
