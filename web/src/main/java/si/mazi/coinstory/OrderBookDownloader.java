@@ -35,12 +35,15 @@ public class OrderBookDownloader {
         try {
             tck = exchange.getTicker("BTC", currency);
             orderBook = exchange.getFullOrderBook("BTC", currency);
+        } catch (RuntimeException e) {
+            log.error("Error connecting to " + service, e);
+            return new AsyncResult<Boolean>(false);
         } catch (Exception e) {
             log.error("Error connecting to {}: {}", service, Utils.joinToString(e));
             return new AsyncResult<Boolean>(false);
         }
         int i = 0;
-        log.info("{} {}: Got ticker, {} bids and {} asks.", new Object[]{service, currency, orderBook.getBids().size(), orderBook.getAsks().size()});
+        log.info("{} {}: Got ticker, {} bids and {} asks.", new Object[]{service, currency, orderBook.getBids() == null ? "no" : orderBook.getBids().size(), orderBook.getAsks() == null ? "no" : orderBook.getAsks().size()});
         em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
             em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
