@@ -160,7 +160,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.xchange>1.6.0</version.xchange>
+        <version.xchange>1.8.0-SNAPSHOT</version.xchange>
     </properties>
 
 </project>

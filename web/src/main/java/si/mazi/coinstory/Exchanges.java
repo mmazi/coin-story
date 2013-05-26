@@ -8,7 +8,7 @@ import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
 import com.xeiam.xchange.campbx.CampBXExchange;
 import com.xeiam.xchange.mtgox.v1.MtGoxExchange;
-import com.xeiam.xchange.service.marketdata.polling.PollingMarketDataService;
+import com.xeiam.xchange.service.polling.PollingMarketDataService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +17,14 @@ import javax.ejb.*;
 import java.util.*;
 import java.util.concurrent.Future;
 
+//import javax.inject.Named;
+
 /**
  * @author Matija Mazi <br/>
  * @created 3/30/13 6:19 PM
  */
 @Singleton
+//@Named
 public class Exchanges {
     private static final Logger log = LoggerFactory.getLogger(Exchanges.class);
 
@@ -51,7 +54,7 @@ public class Exchanges {
         }
     }
 
-    @Schedule(hour = "*", minute = "*/30", persistent = false, info = "Exchange data reader")
+    @Schedule(hour = "*", minute = "0", persistent = false, info = "Exchange data reader")
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public void readAll() {
         Date now = getThisMinute();
@@ -61,8 +64,7 @@ public class Exchanges {
             String serviceName = service.getSimpleName();
             for (String currency : currencies.get(service)) {
                 log.info("Getting from {} for {}", serviceName, currency);
-                Future<Boolean> result =
-                downloader.readData(services.get(service), currency, service.getSimpleName(), now);
+                Future<Boolean> result = downloader.readData(services.get(service), currency, service.getSimpleName(), now);
                 results.put(service, result);
             }
         }
