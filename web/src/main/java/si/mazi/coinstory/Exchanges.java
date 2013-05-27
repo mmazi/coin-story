@@ -7,24 +7,23 @@ import com.xeiam.xchange.ExchangeFactory;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
 import com.xeiam.xchange.campbx.CampBXExchange;
-import com.xeiam.xchange.mtgox.v1.MtGoxExchange;
+import com.xeiam.xchange.mtgox.v2.MtGoxExchange;
 import com.xeiam.xchange.service.polling.PollingMarketDataService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.*;
+import javax.inject.Named;
 import java.util.*;
 import java.util.concurrent.Future;
-
-//import javax.inject.Named;
 
 /**
  * @author Matija Mazi <br/>
  * @created 3/30/13 6:19 PM
  */
 @Singleton
-//@Named
+@Named
 public class Exchanges {
     private static final Logger log = LoggerFactory.getLogger(Exchanges.class);
 
