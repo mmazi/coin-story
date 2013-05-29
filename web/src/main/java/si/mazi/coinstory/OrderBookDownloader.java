@@ -1,6 +1,7 @@
 package si.mazi.coinstory;
 
 import com.google.common.collect.Iterables;
+import com.xeiam.xchange.ExchangeException;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.marketdata.Ticker;
 import com.xeiam.xchange.dto.trade.LimitOrder;
@@ -35,12 +36,13 @@ public class OrderBookDownloader {
         try {
             tck = exchange.getTicker("BTC", currency);
             orderBook = exchange.getFullOrderBook("BTC", currency);
+        } catch (ExchangeException e) {
+            return handleKnownException(service, e);
         } catch (RuntimeException e) {
             log.error("Error connecting to " + service, e);
             return new AsyncResult<Boolean>(false);
         } catch (Exception e) {
-            log.error("Error connecting to {}: {}", service, Utils.joinToString(e));
-            return new AsyncResult<Boolean>(false);
+            return handleKnownException(service, e);
         }
         int i = 0;
         log.info("{} {}: Got ticker, {} bids and {} asks.", new Object[]{service, currency, orderBook.getBids() == null ? "no" : orderBook.getBids().size(), orderBook.getAsks() == null ? "no" : orderBook.getAsks().size()});
@@ -52,6 +54,11 @@ public class OrderBookDownloader {
             }
         }
         return new AsyncResult<Boolean>(true);
+    }
+
+    private Future<Boolean> handleKnownException(String service, Exception e) {
+        log.error("Error connecting to {}: {}", service, Utils.joinToString(e));
+        return new AsyncResult<Boolean>(false);
     }
 
     private Double getDouble(BigDecimal bigDecimal) {
