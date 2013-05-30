@@ -9,6 +9,7 @@ import com.xeiam.xchange.service.polling.PollingMarketDataService;
 import org.joda.money.BigMoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import si.mazi.rescu.HttpException;
 
 import javax.ejb.*;
 import javax.persistence.EntityManager;
@@ -35,14 +36,17 @@ public class OrderBookDownloader {
         log.info("Connecting to {} for {}...", service, currency);
         try {
             tck = exchange.getTicker("BTC", currency);
+            // Wait a while between requests; some exchanges sometimes don't allow frequent request.
+            Thread.sleep(1000);
             orderBook = exchange.getFullOrderBook("BTC", currency);
-        } catch (ExchangeException e) {
-            return handleKnownException(service, e);
+        } catch (ExchangeException | HttpException e) {
+            log.error("Error getting data from {}: {}", service, Utils.joinToString(e));
+            return new AsyncResult<>(false);
         } catch (RuntimeException e) {
             log.error("Error connecting to " + service, e);
-            return new AsyncResult<Boolean>(false);
-        } catch (Exception e) {
-            return handleKnownException(service, e);
+            return new AsyncResult<>(false);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Unexpected interrupt", e);
         }
         int i = 0;
         log.info("{} {}: Got ticker, {} bids and {} asks.", new Object[]{service, currency, orderBook.getBids() == null ? "no" : orderBook.getBids().size(), orderBook.getAsks() == null ? "no" : orderBook.getAsks().size()});
@@ -53,12 +57,7 @@ public class OrderBookDownloader {
                 em.flush();
             }
         }
-        return new AsyncResult<Boolean>(true);
-    }
-
-    private Future<Boolean> handleKnownException(String service, Exception e) {
-        log.error("Error connecting to {}: {}", service, Utils.joinToString(e));
-        return new AsyncResult<Boolean>(false);
+        return new AsyncResult<>(true);
     }
 
     private Double getDouble(BigDecimal bigDecimal) {
