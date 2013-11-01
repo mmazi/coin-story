@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
+import com.xeiam.xchange.btcchina.BTCChinaExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
 import com.xeiam.xchange.campbx.CampBXExchange;
 import com.xeiam.xchange.mtgox.v2.MtGoxExchange;
@@ -20,7 +21,6 @@ import java.util.concurrent.Future;
 
 /**
  * @author Matija Mazi <br/>
- * @created 3/30/13 6:19 PM
  */
 @Singleton
 @Named
@@ -29,10 +29,11 @@ public class Exchanges {
 
     public static final String USD = "USD";
     public static final String EUR = "EUR";
+    public static final String CNY = "CNY";
 
     private static final int FINISH_TIMEOUT_SEC = 90;
 
-    private Map<Class<? extends Exchange>, PollingMarketDataService> services = new HashMap<Class<? extends Exchange>, PollingMarketDataService>();
+    private Map<Class<? extends Exchange>, PollingMarketDataService> services = new HashMap<>();
     private Multimap<Class<? extends Exchange>, String> currencies = LinkedListMultimap.create();
 
     @EJB private OrderBookDownloader downloader;
@@ -45,8 +46,9 @@ public class Exchanges {
         currencies.put(BTCEExchange.class, USD);
         currencies.put(BTCEExchange.class, EUR);
         currencies.put(CampBXExchange.class, USD);
+        currencies.put(BTCChinaExchange.class, CNY);
 
-        List<Class<? extends Exchange>> exchanges = new ArrayList<Class<? extends Exchange>>(currencies.keySet());
+        List<Class<? extends Exchange>> exchanges = new ArrayList<>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {
             Exchange exc = ExchangeFactory.INSTANCE.createExchange(exchange.getCanonicalName());
             services.put(exchange, exc.getPollingMarketDataService());

@@ -1,7 +1,6 @@
 package si.mazi.coinstory;
 
 import com.google.common.collect.Iterables;
-import com.xeiam.xchange.ExchangeException;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.marketdata.Ticker;
 import com.xeiam.xchange.dto.trade.LimitOrder;
@@ -9,18 +8,17 @@ import com.xeiam.xchange.service.polling.PollingMarketDataService;
 import org.joda.money.BigMoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import si.mazi.rescu.HttpException;
 
 import javax.ejb.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.concurrent.Future;
 
 /**
  * @author Matija Mazi <br/>
- * @created 3/30/13 6:13 PM
  */
 @Stateless
 public class OrderBookDownloader {
@@ -39,7 +37,7 @@ public class OrderBookDownloader {
             // Wait a while between requests; some exchanges sometimes don't allow frequent request.
             Thread.sleep(1000);
             orderBook = exchange.getFullOrderBook("BTC", currency);
-        } catch (ExchangeException | HttpException e) {
+        } catch (IOException e) {
             log.error("Error getting data from {}: {}", service, Utils.joinToString(e));
             return new AsyncResult<>(false);
         } catch (RuntimeException e) {
