@@ -40,7 +40,7 @@ public class OrderBookDownloader {
             Thread.sleep(1000);
             orderBook = exchange.getFullOrderBook("BTC", currency);
         } catch (IOException e) {
-            log.error("Error getting {} from {}: {}", new Object[]{what, service, Utils.joinToString(e)});
+            log.error("Error getting {} from {}: {}", what, service, Utils.joinToString(e));
             return new AsyncResult<>(false);
         } catch (RuntimeException e) {
             log.error("Error connecting to " + service + " for " + what, e);
@@ -49,7 +49,7 @@ public class OrderBookDownloader {
             throw new RuntimeException("Unexpected interrupt", e);
         }
         int i = 0;
-        log.info("{} {}: Got ticker, {} bids and {} asks.", new Object[]{service, currency, orderBook.getBids() == null ? "no" : orderBook.getBids().size(), orderBook.getAsks() == null ? "no" : orderBook.getAsks().size()});
+        log.info("{} {}: Got ticker, {} bids and {} asks.", service, currency, orderBook.getBids() == null ? "no" : orderBook.getBids().size(), orderBook.getAsks() == null ? "no" : orderBook.getAsks().size());
         em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
             em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
