@@ -32,16 +32,18 @@ public class OrderBookDownloader {
         OrderBook orderBook;
         Ticker tck;
         log.info("Connecting to {} for {}...", service, currency);
+        String what = "ticker";
         try {
             tck = exchange.getTicker("BTC", currency);
-            // Wait a while between requests; some exchanges sometimes don't allow frequent request.
+            // Wait a while between requests; some exchanges sometimes don't allow frequent requests.
+            what = "order book";
             Thread.sleep(1000);
             orderBook = exchange.getFullOrderBook("BTC", currency);
         } catch (IOException e) {
-            log.error("Error getting data from {}: {}", service, Utils.joinToString(e));
+            log.error("Error getting {} from {}: {}", new Object[]{what, service, Utils.joinToString(e)});
             return new AsyncResult<>(false);
         } catch (RuntimeException e) {
-            log.error("Error connecting to " + service, e);
+            log.error("Error connecting to " + service + " for " + what, e);
             return new AsyncResult<>(false);
         } catch (InterruptedException e) {
             throw new RuntimeException("Unexpected interrupt", e);
