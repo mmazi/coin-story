@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
-import com.xeiam.xchange.ExchangeSpecification;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btcchina.BTCChinaExchange;
 import com.xeiam.xchange.btce.BTCEExchange;
@@ -52,11 +51,6 @@ public class Exchanges {
         List<Class<? extends Exchange>> exchanges = new ArrayList<>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {
             Exchange exc = ExchangeFactory.INSTANCE.createExchange(exchange.getCanonicalName());
-            if (exc instanceof BTCChinaExchange) {
-                final ExchangeSpecification spec = exc.getExchangeSpecification();
-                spec.setSslUri("https://vip.btcchina.com");
-                exc.applySpecification(spec);
-            }
             services.put(exchange, exc.getPollingMarketDataService());
         }
     }
