@@ -68,6 +68,30 @@
             <version>${version.xchange}</version>
         </dependency>
         <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-kraken</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-bitfinex</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-justcoin</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+
+        <!-- PLN only:
+        <dependency>
+            <groupId>com.xeiam.xchange</groupId>
+            <artifactId>xchange-bitcurex</artifactId>
+            <version>${version.xchange}</version>
+        </dependency>
+        -->
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
@@ -171,7 +195,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.xchange>1.10.0-SNAPSHOT</version.xchange>
+        <version.xchange>2.0.0-SNAPSHOT</version.xchange>
     </properties>
 
 </project>

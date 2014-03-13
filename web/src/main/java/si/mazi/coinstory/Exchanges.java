@@ -4,11 +4,13 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.xeiam.xchange.Exchange;
 import com.xeiam.xchange.ExchangeFactory;
+import com.xeiam.xchange.bitfinex.v1.BitfinexExchange;
 import com.xeiam.xchange.bitstamp.BitstampExchange;
 import com.xeiam.xchange.btcchina.BTCChinaExchange;
-import com.xeiam.xchange.btce.BTCEExchange;
+import com.xeiam.xchange.btce.v3.BTCEExchange;
 import com.xeiam.xchange.campbx.CampBXExchange;
-import com.xeiam.xchange.mtgox.v2.MtGoxExchange;
+import com.xeiam.xchange.justcoin.JustcoinExchange;
+import com.xeiam.xchange.kraken.KrakenExchange;
 import com.xeiam.xchange.service.polling.PollingMarketDataService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -40,13 +42,15 @@ public class Exchanges {
 
     public Exchanges() {
         log.debug("Exchanges: init");
-        currencies.put(MtGoxExchange.class, USD);
-        currencies.put(MtGoxExchange.class, EUR);
         currencies.put(BitstampExchange.class, USD);
         currencies.put(BTCEExchange.class, USD);
         currencies.put(BTCEExchange.class, EUR);
         currencies.put(CampBXExchange.class, USD);
         currencies.put(BTCChinaExchange.class, CNY);
+        currencies.put(KrakenExchange.class, EUR);
+        currencies.put(KrakenExchange.class, USD);
+        currencies.put(BitfinexExchange.class, USD);
+        currencies.put(JustcoinExchange.class, EUR);
 
         List<Class<? extends Exchange>> exchanges = new ArrayList<>(currencies.keySet());
         for (Class<? extends Exchange> exchange : exchanges) {

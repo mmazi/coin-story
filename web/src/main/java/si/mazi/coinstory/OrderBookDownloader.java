@@ -1,11 +1,11 @@
 package si.mazi.coinstory;
 
 import com.google.common.collect.Iterables;
+import com.xeiam.xchange.currency.CurrencyPair;
 import com.xeiam.xchange.dto.marketdata.OrderBook;
 import com.xeiam.xchange.dto.marketdata.Ticker;
 import com.xeiam.xchange.dto.trade.LimitOrder;
 import com.xeiam.xchange.service.polling.PollingMarketDataService;
-import org.joda.money.BigMoney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +34,12 @@ public class OrderBookDownloader {
         log.info("Connecting to {} for {}...", service, currency);
         String what = "ticker";
         try {
-            tck = exchange.getTicker("BTC", currency);
+            final CurrencyPair currencyPair = new CurrencyPair("BTC", currency);
+            tck = exchange.getTicker(currencyPair);
             // Wait a while between requests; some exchanges sometimes don't allow frequent requests.
             what = "order book";
             Thread.sleep(1000);
-            orderBook = exchange.getFullOrderBook("BTC", currency);
+            orderBook = exchange.getOrderBook(currencyPair);
         } catch (IOException e) {
             log.error("Error getting {} from {}: {}", what, service, Utils.joinToString(e));
             return new AsyncResult<>(false);
@@ -50,9 +51,9 @@ public class OrderBookDownloader {
         }
         int i = 0;
         log.info("{} {}: Got ticker, {} bids and {} asks.", service, currency, orderBook.getBids() == null ? "no" : orderBook.getBids().size(), orderBook.getAsks() == null ? "no" : orderBook.getAsks().size());
-        em.persist(new Tick(tck.getTradableIdentifier(), dbl(tck.getLast()), dbl(tck.getBid()), dbl(tck.getAsk()), dbl(tck.getHigh()), dbl(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
+        em.persist(new Tick(tck.getCurrencyPair().baseSymbol, getDouble(tck.getLast()), getDouble(tck.getBid()), getDouble(tck.getAsk()), getDouble(tck.getHigh()), getDouble(tck.getLow()), getDouble(tck.getVolume()), time, currency, service));
         for (LimitOrder limitOrder : Iterables.concat(orderBook.getAsks(), orderBook.getBids())) {
-            em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), dbl(limitOrder.getLimitPrice()), time, service, currency));
+            em.persist(new Ord(limitOrder.getType(), getDouble(limitOrder.getTradableAmount()), getDouble(limitOrder.getLimitPrice()), time, service, currency));
             if (i++ % 100 == 0) {
                 em.flush();
             }
@@ -62,9 +63,5 @@ public class OrderBookDownloader {
 
     private Double getDouble(BigDecimal bigDecimal) {
         return bigDecimal == null ? null : bigDecimal.doubleValue();
-    }
-
-    private Double dbl(BigMoney bigMoney) {
-        return bigMoney == null ? null : getDouble(bigMoney.getAmount());
     }
 }
